@@ -1,0 +1,4 @@
+create variable to open and store read1 file
+create variable to open and store read2 file
+create variable to open and store read2 file
+create variable to open and store read3 file
