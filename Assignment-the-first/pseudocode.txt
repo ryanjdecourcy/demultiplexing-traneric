@@ -1,4 +1,123 @@
-create variable to open and store read1 file
-create variable to open and store read2 file
-create variable to open and store read2 file
-create variable to open and store read3 file
+##### DEFINE THE PROBLEM #####
+
+Demultiplexing is the step in processing where we use index information to know which sequences came from which sample after they
+had all been sequence together. Four FASTQ files are provided for this problem. Using the index-pairs, we have to piece together the 
+records of the two biological read files and determine whether specific records reach a minimum quality value or if they're of a
+known index.
+
+##### DEFINE THE OUTPUT #####
+
+The output should include 52 files. 
+
+24 R1 FASTQ files, one for each index.
+24 R2 FASTQ files, one for each index.
+2 non-matching pair files for R1 and R4.
+2 low quality index read files for R1 and R4.
+
+##### THE FOLLOWING IS MY PSEUDOCODE #####
+
+* import itertools library and islice
+
+* file_names_dict <- create a library that holds indexes as keys and file names as values.
+
+def reverse_complement(dna_string):
+	'''Takes a string of DNA characters and determine
+	   the reverse complement.'''
+
+	* Create a string variable called reverse_complement
+	* Iterate through each character of the dna_string input within a for loop. Replace 'A' with 'T' and 'G' with 'C'. Append 
+	  each swapped character to the reverse_complement string.
+	* Reverse the reverse_complement string to get the reverse complement of the input.
+
+	return reverse_complement
+
+def is_known_index(index1):
+	'''Takes the index from read2.txt and determines if they exist within the 24 libraries in the 24_index_list'''
+
+	if index1 contains the character 'N' it means it is an unknown index:
+		return False
+	if index1 is in the 24_index_list it means its a known index.
+		return True	
+
+def is_index_pair(index1, index2):
+	'''Takes two indexes and determines if the reverse complement of one index matches the other index.''
+	
+	* index2_reverse_comp <- call the reverse_complement function and pass it index2 as an input, store the return string in this variable.
+
+	* If index2_reverse_comp is equivalent to index1, return True. Otherwise return False.
+
+
+* read1 <- create variable to store and open read1.txt
+* read2 <- variable to store and open read2.txt
+* read3 <- variable to store and open read3.txt
+* read4 <- variable to store and open read4.txt
+
+* num_matched_indexes <- set this variable to 0 and increment when a matched index is found per index-pair.
+* num_index_hopping <- set this variable to 0 and increment when an index hop is found per index-pair.
+* unknown_index <-  set this variable to 0 and increment when an index hop is found per unknown index-pair.
+
+while True:
+
+	* dna1_record <- call the islice method from the itertools library to slice out four lines of read1 and covert these lines into a list of four elements
+	* dna2_record <- call the islice method from the itertools library to slice out four lines of read4 and covert these lines into a list of four elements
+	* index1_record <- call the islice method from the itertools library to slice out four lines of read2 and covert these lines into a list of four elements
+	* index2_record <- call the islice method from the itertools library to slice out lines of read3 and covert these lines into a list of four elements
+
+	* biological_read1 <- extract the biological read from the dna1_record (dna1_record[1])
+	* biological_read2 <- extract the biological read from the dna2_record (dna2_record[1])
+	* index1 <- extract the index read from index1_record (index1_record[1])
+	* index2 <- extract the index read from index2_record (index2_record[1])
+
+	* index_pair <- Create this variable to hold the index-pair for the header of your reads. Append index1 to index2 with a '-' separator
+
+	if the "is_known_index(index1_record[1])" method call returns False do the following:
+		* Increment the unknown_index by 1.
+		* Add the first biological read (dna1_record[1]) and second biological read (dna2_record[1]) into the non-matching index pair files.
+		* Continue to the next iteration of the while loop.
+
+	if the "is_index_pair(index1, index2)" method call returns True do the following:
+
+		* A matched index pair is found, increment num_matched_indexes by 1.
+		* Append the index_pair into the header line of each record (the first object of dna1_record and dna2_record).
+
+		* Run a for loop to append the record lines from dna1_record and dna2_record into their corresponding forward and reverse
+		  FASTQ files. This step essentially writes the records with the index-pair header back into the FASTQ files. The name of 
+	          the file will be determined by running the index through a dictionary using regular expressions.
+
+	else do the following:
+		
+		* This is a non-matching index pair so it is index-hopped. Increment the num_index_hopping by one.
+		* This else statement is reached when non matching index pairs are found.
+		* Append the index_pair into the header line of each record (the first object of dna1_record and dna2_record).
+
+		* Run a for loop to append the record lines from dna1_record and dna2_record into their corresponding forward and reverse
+		  non-matching index-pair FASTQ files. This step essentially writes the records with the index-pair header back into the 
+		  FASTQ files.
+
+	if the dna1_record list is an empty list do the following:
+		* Break out of the while loop. This means the islice method has reached the end of the 4 FASTQ Files.
+
+
+##### BELOW ARE TEST EXAMPLES FOR MY FUNCTIONS #####
+def reverse_complement(dna_string)
+Input: ATGC
+Output: GCAT
+
+def is_known_index(index1)
+Input: GTAGCGTA
+Output: True
+
+def is_known_index(index1)
+Input: NTAGCGTA
+Output: False
+
+def is_index_pair(index1, index2):
+Input: AAA, TTT
+Output: True
+
+def is_index_pair(index1, index2):
+Input: ACA, TGA
+Output: False
+
+
+
