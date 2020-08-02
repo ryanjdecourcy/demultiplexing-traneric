@@ -16,6 +16,8 @@ The output should include 52 files.
 
 ##### THE FOLLOWING IS MY PSEUDOCODE #####
 
+Testing..
+
 * import itertools library and islice
 
 * file_names_dict <- create a library that holds indexes as keys and file names as values.
